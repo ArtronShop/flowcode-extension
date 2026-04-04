@@ -1,6 +1,6 @@
 import type { BlockCategory, CodeGenContext } from '../types.js';
 
-function SHT4xRegistor(
+function SHT3xRegistor(
     registerPreprocessor: CodeGenContext['registerPreprocessor'], 
     registerGlobal: CodeGenContext['registerGlobal'], 
     registerFunction: CodeGenContext['registerFunction']
@@ -14,23 +14,23 @@ function SHT4xRegistor(
         'bool sht3x_read(float * t, float * h)',
         '  static bool init = false;\n' +
         '  if (!init) {\n' + 
-        '    if (!sht4x.begin()) {\n' +
+        '    if (!sht3x.begin()) {\n' +
         '      return false;\n' +
         '    }\n' +
         '    init = true;\n' +
         '  }\n' +
         '\n' +
-        '  if (!sht4x.measure()) {\n' +
+        '  if (!sht3x.measure()) {\n' +
         '    init = false;\n' +
         '    return false;\n' +
         '  }\n' +
         '  if (t) {\n' +
-        '    *t = sht4x.temperature();\n' +
+        '    *t = sht3x.temperature();\n' +
         '  }\n' +
         '  if (h) {\n' + 
-        '    *h = sht4x.humidity();\n' +
+        '    *h = sht3x.humidity();\n' +
         '  }',
-        'bool sht4x_read(float * t, float * h) ;'
+        'bool sht3x_read(float * t, float * h) ;'
     );
 }
 
@@ -57,7 +57,7 @@ const sht3xExtension: BlockCategory = {
                 ]}
             ],
 			toCode({ pad, block, registerPreprocessor, registerGlobal, registerFunction, safeId, params }) {
-                SHT4xRegistor(registerPreprocessor, registerGlobal, registerFunction);
+                SHT3xRegistor(registerPreprocessor, registerGlobal, registerFunction);
                 
                 const value_type = params.value_type ?? 't';
                 const id = safeId(block.id);
