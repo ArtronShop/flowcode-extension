@@ -75,8 +75,8 @@ const xymd02Extension: BlockCategory = {
                 return { 
                     parts: [
                         [`${pad}modbus_master_init(${device_id});`],
-                        [`${pad}uint8_t result = node.readInputRegisters(1, 2); // Read 2 registers starting at address 1`],
-                        [`${pad}if (result == node.ku8MBSuccess) {`],
+                        [`${pad}uint8_t ${id}_result = node.readInputRegisters(1, 2); // Read 2 registers starting at address 1`],
+                        [`${pad}if (${id}_result == node.ku8MBSuccess) {`],
                         [`${pad}  float temp = node.getResponseBuffer(0) / 10.0f;`],
                         [`${pad}  float humi = node.getResponseBuffer(1) / 10.0f;`],
                         [`${pad}  float ${id} = ${value_type === 't' ? 'temp' : 'humi'};`],
