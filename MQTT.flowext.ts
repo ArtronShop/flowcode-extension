@@ -201,8 +201,8 @@ const mqttExtension: BlockCategory = {
 				const payload = resolveInput('payload') ?? `"${(params.payload ?? '').replaceAll('"', '\\"')}"`;
 				return {
 					parts: [
-						[`${pad}String ${id}_payload = String(${payload})`],
-						[`${pad}if (mqtt.publish("${topic}", ${payload}.c_str(), ${retained})) {`],
+						[`${pad}String ${id}_payload = String(${payload});`],
+						[`${pad}if (mqtt.publish("${topic}", ${id}_payload.c_str(), ${retained})) {`],
 						{ portId: 'ok', depthDelta: 1 },
 						[`${pad}} else {`],
 						{ portId: 'error', depthDelta: 1 },
