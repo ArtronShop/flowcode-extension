@@ -52,7 +52,21 @@ const mqttExtension: BlockCategory = {
 				registerGlobal(`String mqtt_username = "";`);
 				registerGlobal(`String mqtt_password = "";`);
 
-				registerPollingCode('mqtt.loop();');
+				registerPollingCode([
+					'if (mqtt.connected()) {',
+					'  mqtt.loop();',
+					'} else {',
+					'#ifdef MQTT_ON_DISCONNECT_CB',
+					'  MQTT_ON_DISCONNECT_CB();',
+					'#endif',
+					'  bool connected = mqtt.connect(mqtt_client.c_str(), mqtt_username.length() > 0 ? mqtt_username.c_str() : NULL, mqtt_password.length() > 0 ? mqtt_password.c_str() : NULL);',
+					'  if (connected) {',
+					'#ifdef MQTT_ON_CONNECTED_CB',
+					'    MQTT_ON_CONNECTED_CB();',
+					'#endif',
+					'  }',
+					'}'
+				].join('\n'));
 
 				return {
 					parts: [
@@ -68,61 +82,61 @@ const mqttExtension: BlockCategory = {
 			}
 		},
 		{
-			id: 'mqtt_set_callback',
-			name: 'MQTT Set Callback',
-			color: COLOR,
-			icon: '🔔',
-			category: 'mqtt',
+			id: 'mqtt_on_connected',
+			name: 'MQTT On Connected',
 			trigger: true,
-			description: 'ลงทะเบียน callback ที่เรียกเมื่อรับ message จาก broker\nภายใน handler: _mqtt_topic (String), _mqtt_payload (String)',
+			color: COLOR,
+			icon: '🔗',
+			category: 'mqtt',
+			description: 'เมื่อเชื่อมต่อ MQTT broker สำเร็จ',
 			inputs: [],
 			outputs: [
-				{ id: 'handler', type: 'output', label: '➜', dataType: 'any', description: 'โค้ดที่รันเมื่อรับ message' },
+				{ id: 'out', type: 'output', label: '➜', dataType: 'void', description: 'บล็อกที่ต้องการให้ทำงานเมื่อเชื่อมต่อ MQTT สำเร็จ' },
 			],
-			toCode({ pad, block, safeId, params, captureCode, registerPreprocessor, registerFunction }) {
-				registerPreprocessor('#include <PubSubClient.h>');
-				const id = safeId(block.id);
-				const fnName = `_mqtt_cb_${id}`;
-				const body = captureCode('handler', 1);
+			toCode({ captureCode, registerFunction, registerPreprocessor }) {
+				const body = captureCode('out', 1) ?? '';
+
 				registerFunction(
-					`void ${fnName}(char* _raw_topic, byte* _raw_payload, unsigned int _raw_len)`,
-					[
-						`  String _mqtt_topic = String(_raw_topic);`,
-						`  String _mqtt_payload = "";`,
-						`  for (unsigned int i = 0; i < _raw_len; i++) _mqtt_payload += (char)_raw_payload[i];`,
-						body,
-					].filter(Boolean).join('\n'),
-					`void ${fnName}(char*, byte*, unsigned int);`
+					'void on_mqtt_connected()',
+					body,
+					'void on_mqtt_connected() ;'
 				);
+				
+				registerPreprocessor("#define MQTT_ON_CONNECTED_CB on_mqtt_connected")
+
 				return {
 					parts: [
-						[`${pad}mqtt.setCallback(${fnName});`],
+
 					]
 				};
 			}
 		},
 		{
-			id: 'mqtt_connect',
-			name: 'MQTT Connect',
+			id: 'mqtt_on_disconnect',
+			name: 'MQTT On Disconnect',
+			trigger: true,
 			color: COLOR,
 			icon: '🔗',
 			category: 'mqtt',
-			description: 'เชื่อมต่อ MQTT broker ด้วย Client ID, Username, Password (mqtt.connect)',
-			inputs: [{ id: 'in', type: 'input', label: '➜', dataType: 'any' }],
+			description: 'เมื่อหลุดการเชื่อมต่อ MQTT broker',
+			inputs: [],
 			outputs: [
-				{ id: 'ok', type: 'output', label: 'OK', dataType: 'void', description: 'เชื่อมต่อสำเร็จ' },
-				{ id: 'error', type: 'output', label: 'Error', dataType: 'void', description: 'เชื่อมต่อไม่สำเร็จ' },
-				{ id: 'out', type: 'output', label: '➜', dataType: 'void', description: 'ส่งต่อเสมอหลัง if/else' },
+				{ id: 'out', type: 'output', label: '➜', dataType: 'void', description: 'บล็อกที่ต้องการให้ทำงานเมื่อหลุดการเชื่อมต่อ MQTT' },
 			],
-			toCode({ pad }) {
+			toCode({ captureCode, registerFunction, registerPreprocessor }) {
+				const body = captureCode('out', 1) ?? '';
+
+				registerFunction(
+					'void on_mqtt_disconnect()',
+					body,
+					'void on_mqtt_disconnect() ;'
+				);
+
+				registerPreprocessor("#define MQTT_ON_DISCONNECT_CB on_mqtt_disconnect")
+
 				return {
 					parts: [
-						[`${pad}if (mqtt.connect(mqtt_client.c_str(), mqtt_username.length() > 0 ? mqtt_username.c_str() : NULL, mqtt_password.length() > 0 ? mqtt_password.c_str() : NULL)) {`],
-						{ portId: 'ok', depthDelta: 1 },
-						[`${pad}} else {`],
-						{ portId: 'error', depthDelta: 1 },
-						[`${pad}}`],
-						{ portId: 'out', depthDelta: 0 },
+
 					]
 				};
 			}
@@ -140,7 +154,7 @@ const mqttExtension: BlockCategory = {
 				{ id: 'disconnected', type: 'output', label: 'Disconnected', dataType: 'void' },
 				{ id: 'out', type: 'output', label: '➜', dataType: 'void' },
 			],
-			toCode({ pad, params }) {
+			toCode({ pad }) {
 				return {
 					parts: [
 						[`${pad}if (mqtt.connected()) {`],
@@ -164,7 +178,7 @@ const mqttExtension: BlockCategory = {
 			description: 'ส่ง message ไปยัง topic (mqttClient.publish)',
 			inputs: [
 				{ id: 'in', type: 'input', label: '➜', dataType: 'any', description: 'รับสายลำดับการทำงานจากบล็อกก่อนหน้า' },
-				{ id: 'payload', type: 'input', label: 'Payload', dataType: 'String', description: 'ข้อมูลที่จะส่ง' },
+				{ id: 'payload', type: 'input', label: 'Payload', dataType: 'any', description: 'ข้อมูลที่จะส่ง' },
 			],
 			outputs: [
 				{ id: 'ok', type: 'output', label: 'OK', dataType: 'void', description: 'ส่งสำเร็จ' },
@@ -180,14 +194,15 @@ const mqttExtension: BlockCategory = {
 					description: 'ให้ broker เก็บ message ล่าสุดไว้หรือไม่'
 				},
 			],
-			toCode({ pad, params, resolveInput }) {
+			toCode({ block, safeId, pad, params, resolveInput }) {
+				const id = safeId(block.id);
 				const topic = (params.topic ?? 'sensors/temp').replaceAll('"', '\\"');
 				const retained = params.retained ?? 'false';
-				const payload_inp = resolveInput('payload')
-				const payload = payload_inp ? payload_inp + '.c_str()' : `"${(params.payload ?? '').replaceAll('"', '\\"')}"`;
+				const payload = resolveInput('payload') ?? `"${(params.payload ?? '').replaceAll('"', '\\"')}"`;
 				return {
 					parts: [
-						[`${pad}if (mqtt.publish("${topic}", ${payload}, ${retained})) {`],
+						[`${pad}String ${id}_payload = String(${payload})`],
+						[`${pad}if (mqtt.publish("${topic}", ${payload}.c_str(), ${retained})) {`],
 						{ portId: 'ok', depthDelta: 1 },
 						[`${pad}} else {`],
 						{ portId: 'error', depthDelta: 1 },
@@ -252,6 +267,40 @@ const mqttExtension: BlockCategory = {
 
 		// ─── Received message helpers ─────────────────────────────────────
 		{
+			id: 'mqtt_on_received',
+			name: 'MQTT On Received',
+			color: COLOR,
+			icon: '🔔',
+			category: 'mqtt',
+			trigger: true,
+			description: 'ลงทะเบียน callback ที่เรียกเมื่อรับ message จาก broker\nภายใน handler: _mqtt_topic (String), _mqtt_payload (String)',
+			inputs: [],
+			outputs: [
+				{ id: 'handler', type: 'output', label: '➜', dataType: 'any', description: 'โค้ดที่รันเมื่อรับ message' },
+			],
+			toCode({ pad, block, safeId, params, captureCode, registerPreprocessor, registerFunction }) {
+				registerPreprocessor('#include <PubSubClient.h>');
+				const id = safeId(block.id);
+				const fnName = `_mqtt_cb_${id}`;
+				const body = captureCode('handler', 1);
+				registerFunction(
+					`void ${fnName}(char* _raw_topic, byte* _raw_payload, unsigned int _raw_len)`,
+					[
+						`  String _mqtt_topic = String(_raw_topic);`,
+						`  String _mqtt_payload = "";`,
+						`  for (unsigned int i = 0; i < _raw_len; i++) _mqtt_payload += (char)_raw_payload[i];`,
+						body,
+					].filter(Boolean).join('\n'),
+					`void ${fnName}(char*, byte*, unsigned int);`
+				);
+				return {
+					parts: [
+						[`${pad}mqtt.setCallback(${fnName});`],
+					]
+				};
+			}
+		},
+		{
 			id: 'mqtt_recv_topic',
 			name: 'MQTT Received Topic',
 			color: COLOR,
@@ -265,7 +314,7 @@ const mqttExtension: BlockCategory = {
 				const id = safeId(block.id);
 				return {
 					parts: [
-						[`${pad}String ${id} = _mqtt_topic;`],
+						// [`${pad}String ${id} = _mqtt_topic;`],
 						{ portId: 'topic', depthDelta: 0 },
 					]
 				};
@@ -285,7 +334,7 @@ const mqttExtension: BlockCategory = {
 				const id = safeId(block.id);
 				return {
 					parts: [
-						[`${pad}String ${id} = _mqtt_payload;`],
+						// [`${pad}String ${id} = _mqtt_payload;`],
 						{ portId: 'payload', depthDelta: 0 },
 					]
 				};
@@ -306,6 +355,9 @@ const mqttExtension: BlockCategory = {
 				return {
 					parts: [
 						[`${pad}mqtt.disconnect();`],
+						['#ifdef MQTT_ON_DISCONNECT_CB'],
+						[`${pad}MQTT_ON_DISCONNECT_CB();`],
+						['#endif'],
 						{ portId: 'out', depthDelta: 0 },
 					]
 				};
