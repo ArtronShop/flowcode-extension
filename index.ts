@@ -6,6 +6,7 @@ import xymd02Extension from "./XY-MD02.flowext";
 import mqttExtension from "./MQTT.flowext";
 import blynkExtension from "./Blynk.flowext";
 import modbusMasterExtension from "./ModbusMaster.flowext";
+import jsonExtension from "./Json.flowext";
 
 const extensionIndex: ExtensionProps[] = [
     {
@@ -57,10 +58,19 @@ const extensionIndex: ExtensionProps[] = [
         id: 'ModbusMaster',
         name: 'Modbus Master (RTU)',
         author: 'ArtronShop CO.,LTD.',
-        description: 'Modbus RTU Master สำหรับอ่าน/เขียน Coils และ Registers ผ่าน RS-485\nรองรับ FC01, FC02, FC03, FC04, FC05, FC06, FC15, FC16',
+        description: 'Read/Write Coils and Registers via RS485',
         version: '1.0.0',
         depends: [ 'ModbusMaster@2.0.1' ],
         src: modbusMasterExtension,
+    },
+    {
+        id: 'JSON',
+        name: 'Json',
+        author: 'ArtronShop CO.,LTD.',
+        description: 'Parse/Create/Serialize JSON (JavaScript Object Notation)',
+        version: '1.0.0',
+        depends: [ 'ArduinoJson@7.4.1' ],
+        src: jsonExtension,
     },
 ];
 
