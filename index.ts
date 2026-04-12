@@ -5,6 +5,7 @@ import sht3xExtension from "./SHT3x.flowext";
 import xymd02Extension from "./XY-MD02.flowext";
 import mqttExtension from "./MQTT.flowext";
 import blynkExtension from "./Blynk.flowext";
+import modbusMasterExtension from "./ModbusMaster.flowext";
 
 const extensionIndex: ExtensionProps[] = [
     {
@@ -51,6 +52,15 @@ const extensionIndex: ExtensionProps[] = [
         version: '1.0.0',
         depends: [ 'ModbusMaster@2.0.1' ],
         src: xymd02Extension,
+    },
+    {
+        id: 'ModbusMaster',
+        name: 'Modbus Master (RTU)',
+        author: 'ArtronShop CO.,LTD.',
+        description: 'Modbus RTU Master สำหรับอ่าน/เขียน Coils และ Registers ผ่าน RS-485\nรองรับ FC01, FC02, FC03, FC04, FC05, FC06, FC15, FC16',
+        version: '1.0.0',
+        depends: [ 'ModbusMaster@2.0.1' ],
+        src: modbusMasterExtension,
     },
 ];
 
