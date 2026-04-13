@@ -8,6 +8,10 @@ import blynkExtension from "./Blynk.flowext";
 import modbusMasterExtension from "./ModbusMaster.flowext";
 import jsonExtension from "./Json.flowext";
 import ntpExtension from "./NTP.flowext";
+import influxdbExtension from "./InfluxDB.flowext";
+import ds18b20Extension from "./DS18B20.flowext";
+import ahtExtension from "./AHT.flowext";
+import lcdExtension from "./LCD.flowext";
 
 const extensionIndex: ExtensionProps[] = [
     {
@@ -80,6 +84,42 @@ const extensionIndex: ExtensionProps[] = [
         description: 'Sync and read real-time clock via NTP server (built-in ESP32, no extra library needed)',
         version: '1.0.0',
         src: ntpExtension,
+    },
+    {
+        id: 'InfluxDB',
+        name: 'InfluxDB Client',
+        author: 'ArtronShop CO.,LTD.',
+        description: 'Write time-series data to InfluxDB v2 using influxdb-client-arduino',
+        version: '1.0.0',
+        depends: [ 'InfluxDBClient@3.14.0' ],
+        src: influxdbExtension,
+    },
+    {
+        id: 'DS18B20',
+        name: 'DS18B20 Temperature Sensor',
+        author: 'ArtronShop CO.,LTD.',
+        description: 'Read temperature from DS18B20 digital sensor via OneWire bus',
+        version: '1.0.0',
+        depends: [ 'OneWire@2.3.8', 'DallasTemperature@4.0.6' ],
+        src: ds18b20Extension,
+    },
+    {
+        id: 'AHT',
+        name: 'AHT10 / AHT20 / AHT30 Sensor',
+        author: 'ArtronShop CO.,LTD.',
+        description: 'Read temperature and humidity from AHT10, AHT20, AHT30 via I2C (Adafruit AHTX0)',
+        version: '1.0.0',
+        depends: [ 'Adafruit AHTX0@2.0.5', 'Adafruit Unified Sensor@1.1.14' ],
+        src: ahtExtension,
+    },
+    {
+        id: 'LCD',
+        name: 'LCD I2C (LiquidCrystal_I2C)',
+        author: 'ArtronShop CO.,LTD.',
+        description: 'Drive I2C LCD displays (HD44780 compatible) — Begin, Print, Clear, SetCursor, Backlight',
+        version: '1.0.0',
+        depends: [ 'LiquidCrystal_I2C@2.0.0' ],
+        src: lcdExtension,
     },
 ];
 
