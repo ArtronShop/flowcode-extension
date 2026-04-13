@@ -12,6 +12,13 @@ import influxdbExtension from "./InfluxDB.flowext";
 import ds18b20Extension from "./DS18B20.flowext";
 import ahtExtension from "./AHT.flowext";
 import lcdExtension from "./LCD.flowext";
+import servoExtension from "./Servo.flowext";
+import buzzerExtension from "./Buzzer.flowext";
+import telegramExtension from "./Telegram.flowext";
+import lineExtension from "./LINE.flowext";
+import lowPowerExtension from "./LowPower.flowext";
+import websocketExtension from "./WebSocket.flowext";
+import otaExtension from "./OTA.flowext";
 
 const extensionIndex: ExtensionProps[] = [
     {
@@ -120,6 +127,66 @@ const extensionIndex: ExtensionProps[] = [
         version: '1.0.0',
         depends: [ 'LiquidCrystal_I2C@2.0.0' ],
         src: lcdExtension,
+    },
+    {
+        id: 'Servo',
+        name: 'Servo Motor',
+        author: 'ArtronShop CO.,LTD.',
+        description: 'Control servo motors on ESP32 using ESP32Servo library — Attach, Write angle, Read, Detach',
+        version: '1.0.0',
+        depends: [ 'ESP32Servo@3.1.3' ],
+        src: servoExtension,
+    },
+    {
+        id: 'Buzzer',
+        name: 'Buzzer (Tone)',
+        author: 'ArtronShop CO.,LTD.',
+        description: 'Drive a passive buzzer with tone/noTone (built-in ESP32 Arduino core, no extra library)',
+        version: '1.0.0',
+        src: buzzerExtension,
+    },
+    {
+        id: 'Telegram',
+        name: 'Telegram Bot',
+        author: 'ArtronShop CO.,LTD.',
+        description: 'Send and receive messages via Telegram Bot API using UniversalTelegramBot library',
+        version: '1.0.0',
+        depends: [ 'UniversalTelegramBot@1.3.0', 'ArduinoJson@7.4.1' ],
+        src: telegramExtension,
+    },
+    {
+        id: 'LINE',
+        name: 'LINE Message',
+        author: 'ArtronShop CO.,LTD.',
+        description: 'Send messages and images via LINE Messaging API using ArtronShop_LineMessaging library',
+        version: '1.0.0',
+        depends: [ 'ArtronShop_LineMessaging@1.0.1' ],
+        src: lineExtension,
+    },
+    {
+        id: 'LowPower',
+        name: 'Low Power (Sleep Mode)',
+        author: 'ArtronShop CO.,LTD.',
+        description: 'ESP32 Deep Sleep (timer/pin wakeup), Light Sleep, and Wakeup Reason — built-in, no extra library',
+        version: '1.0.0',
+        src: lowPowerExtension,
+    },
+    {
+        id: 'WebSocket',
+        name: 'WebSocket Server',
+        author: 'ArtronShop CO.,LTD.',
+        description: 'WebSocket server on ESP32 using WebSocketsServer — begin, send, broadcast, on-message trigger',
+        version: '1.0.0',
+        depends: [ 'WebSockets@2.4.1' ],
+        src: websocketExtension,
+    },
+    {
+        id: 'OTA',
+        name: 'OTA Update (ArduinoOTA)',
+        author: 'ArtronShop CO.,LTD.',
+        description: 'Over-the-Air firmware update via WiFi using ArduinoOTA (built-in ESP32 Arduino core)',
+        version: '1.0.0',
+        src: otaExtension,
     },
 ];
 
