@@ -7,6 +7,7 @@ import mqttExtension from "./MQTT.flowext";
 import blynkExtension from "./Blynk.flowext";
 import modbusMasterExtension from "./ModbusMaster.flowext";
 import jsonExtension from "./Json.flowext";
+import ntpExtension from "./NTP.flowext";
 
 const extensionIndex: ExtensionProps[] = [
     {
@@ -71,6 +72,14 @@ const extensionIndex: ExtensionProps[] = [
         version: '1.0.0',
         depends: [ 'ArduinoJson@7.4.1' ],
         src: jsonExtension,
+    },
+    {
+        id: 'NTP',
+        name: 'NTP (Network Time Protocol)',
+        author: 'ArtronShop CO.,LTD.',
+        description: 'Sync and read real-time clock via NTP server (built-in ESP32, no extra library needed)',
+        version: '1.0.0',
+        src: ntpExtension,
     },
 ];
 
