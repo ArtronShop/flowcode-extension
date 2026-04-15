@@ -14,22 +14,31 @@ function SHT3xRegistor(
         'bool sht3x_read(float * t, float * h)',
         '  static bool init = false;\n' +
         '  if (!init) {\n' + 
+        '    Wire.begin();\n' + 
         '    if (!sht3x.begin()) {\n' +
         '      return false;\n' +
         '    }\n' +
+        '    delay(50);\n' +
         '    init = true;\n' +
         '  }\n' +
         '\n' +
-        '  if (!sht3x.measure()) {\n' +
-        '    init = false;\n' +
-        '    return false;\n' +
+        '  static uint32_t last_measure = 0;\n' +
+        '  if ((last_measure == 0) || ((millis() - last_measure) >= (100)) || (millis() < last_measure)) {\n' +
+        '    last_measure = millis();\n' +
+        '    if (!sht3x.measure()) {\n' +
+        '      init = false;\n' +
+        '      return false;\n' +
+        '    }\n' +
         '  }\n' +
+        '\n' +
         '  if (t) {\n' +
         '    *t = sht3x.temperature();\n' +
         '  }\n' +
         '  if (h) {\n' + 
         '    *h = sht3x.humidity();\n' +
-        '  }',
+        '  }\n' +
+        '\n' +
+        '  return true;',
         'bool sht3x_read(float * t, float * h) ;'
     );
 }
