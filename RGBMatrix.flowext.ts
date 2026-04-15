@@ -3,6 +3,22 @@ import type { BlockCategory } from '../types.js';
 const COLOR_UI = '#dc2626'; // red
 const MATRIX_VAR = '_matrix';
 
+// ─── printf helpers (local copy) ─────────────────────────────────────────────
+function getPrintfSpecifiers(format: string): string[] {
+	const matches = format.match(/%%|%[-+0 #]*(?:\*|\d+)?(?:\.(?:\*|\d+))?(?:hh?|ll?|[ljztL])?[diouxXeEfgGaAcspn]/g) ?? [];
+	return matches.filter(m => m !== '%%').map(m => m[m.length - 1]);
+}
+function specifierToDataType(spec: string): string {
+	if ('diouxX'.includes(spec)) return 'int';
+	if ('eEfgGaA'.includes(spec)) return 'float';
+	if (spec === 's') return 'String';
+	if (spec === 'c') return 'char';
+	return 'any';
+}
+function wrapPrintfArgs(args: string[], specs: string[]): string[] {
+	return args.map((a, i) => specs[i] === 's' ? `String(${a}).c_str()` : a);
+}
+
 const rgbMatrixExtension: BlockCategory = {
 	id: 'rgb_matrix',
 	name: 'RGB LED Matrix',
@@ -421,6 +437,66 @@ const rgbMatrixExtension: BlockCategory = {
 							`${pad}${MATRIX_VAR}.setTextSize(${size});`,
 							`${pad}${MATRIX_VAR}.setTextWrap(false);`,
 							`${pad}${MATRIX_VAR}.print(${text});`,
+						],
+						{ portId: 'out', depthDelta: 0 },
+					]
+				};
+			}
+		},
+		{
+			id: 'matrix_print_format',
+			name: 'Matrix Print Format',
+			color: COLOR_UI,
+			icon: '✏️',
+			category: 'RGBMatrix',
+			description: 'พิมพ์ข้อความที่ตำแหน่ง (x, y) พร้อมกำหนดสีและขนาด font',
+			inputs: [],
+			outputs: [{ id: 'out', type: 'output', label: '➜', dataType: 'void' }],
+			params: [
+				{ id: 'x', type: 'number', label: 'X', default: '0' },
+				{ id: 'y', type: 'number', label: 'Y', default: '0' },
+				{ id: 'format', type: 'text', label: 'Format', default: 'Value=%d' },
+				{ id: 'color', type: 'color', format: 'rgb565', label: 'Color', default: '0xFFFF' },
+				{
+					id: 'size', type: 'number', label: 'Text Size', default: '1',
+					validation: (n: number) => Math.max(1, Math.trunc(n))
+				},
+			],
+			dynamicPorts({ format }) {
+				const specs = getPrintfSpecifiers(format ?? '%d');
+				return {
+					inputs: [
+						{ id: 'in', type: 'input', label: '➜', dataType: 'any' },
+						{ id: 'x', type: 'input', label: 'X', dataType: 'int' },
+						{ id: 'y', type: 'input', label: 'Y', dataType: 'int' },
+						...specs.map((spec, i) => ({
+							id: `arg${i + 1}`, type: 'input' as const, label: `Arg ${i + 1}`, dataType: specifierToDataType(spec) as import('./types.js').DataType
+						})),
+						{ id: 'color', type: 'input', label: 'Color', dataType: 'int' },
+					]
+				};
+			},
+			toCode({ pad, params, resolveInput, registerPreprocessor }) {
+				registerPreprocessor('#include <Adafruit_Protomatter.h>');
+				const x = resolveInput('x') ?? params.x ?? '0';
+				const y = resolveInput('y') ?? params.y ?? '0';
+
+				const fmt = (params.format ?? '%d').replaceAll('"', '\\"');
+				const specs = getPrintfSpecifiers(fmt);
+				const args = specs.map((_, i) => resolveInput(`arg${i + 1}`) ?? '0');
+				const wrappedArgs = wrapPrintfArgs(args, specs);
+				const argsPart = wrappedArgs.length > 0 ? `, ${wrappedArgs.join(', ')}` : '';
+
+				const color = resolveInput('color') ?? params.color ?? '0xFFFF';
+				const size = params.size ?? '1';
+				return {
+					parts: [
+						[
+							`${pad}${MATRIX_VAR}.setCursor(${x}, ${y});`,
+							`${pad}${MATRIX_VAR}.setTextColor(${color});`,
+							`${pad}${MATRIX_VAR}.setTextSize(${size});`,
+							`${pad}${MATRIX_VAR}.setTextWrap(false);`,
+							`${pad}${MATRIX_VAR}.printf("${fmt}"${argsPart});`,
 						],
 						{ portId: 'out', depthDelta: 0 },
 					]
