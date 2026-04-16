@@ -470,7 +470,7 @@ const rgbMatrixExtension: BlockCategory = {
 						{ id: 'x', type: 'input', label: 'X', dataType: 'int' },
 						{ id: 'y', type: 'input', label: 'Y', dataType: 'int' },
 						...specs.map((spec, i) => ({
-							id: `arg${i + 1}`, type: 'input' as const, label: `Arg ${i + 1}`, dataType: specifierToDataType(spec) as import('./types.js').DataType
+							id: `arg${i + 1}`, type: 'input' as const, label: `Arg ${i + 1}`, dataType: specifierToDataType(spec) as import('../types.js').DataType
 						})),
 						{ id: 'color', type: 'input', label: 'Color', dataType: 'int' },
 					]
