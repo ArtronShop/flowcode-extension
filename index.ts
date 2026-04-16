@@ -20,6 +20,7 @@ import lowPowerExtension from "./LowPower.flowext";
 import websocketExtension from "./WebSocket.flowext";
 import otaExtension from "./OTA.flowext";
 import rgbMatrixExtension from "./RGBMatrix.flowext";
+import atsthExtension from "./ATS-TH.flowext";
 
 const extensionIndex: ExtensionProps[] = [
     {
@@ -59,15 +60,6 @@ const extensionIndex: ExtensionProps[] = [
         src: blynkExtension,
     },
     {
-        id: 'XY-MD02',
-        name: 'XY-MD02 Temp & Humid Sensor',
-        author: 'ArtronShop CO.,LTD.',
-        description: 'Get temperature and humidity from XY-MD02 sensor',
-        version: '1.0.0',
-        depends: [ 'ModbusMaster@2.0.1' ],
-        src: xymd02Extension,
-    },
-    {
         id: 'ModbusMaster',
         name: 'Modbus Master (RTU)',
         author: 'ArtronShop CO.,LTD.',
@@ -75,6 +67,15 @@ const extensionIndex: ExtensionProps[] = [
         version: '1.0.0',
         depends: [ 'ModbusMaster@2.0.1' ],
         src: modbusMasterExtension,
+    },
+    {
+        id: 'XY-MD02',
+        name: 'XY-MD02 Temp & Humid Sensor',
+        author: 'ArtronShop CO.,LTD.',
+        description: '(ModbusMaster Request) Get temperature and humidity from XY-MD02 sensor',
+        version: '1.0.0',
+        depends: [ ],
+        src: xymd02Extension,
     },
     {
         id: 'JSON',
@@ -197,6 +198,15 @@ const extensionIndex: ExtensionProps[] = [
         version: '1.0.0',
         depends: [ 'Adafruit Protomatter@1.7.1', 'Adafruit GFX Library@1.12.6' ],
         src: rgbMatrixExtension,
+    },
+    {
+        id: 'ATS-TH',
+        name: 'ATS-TH Temp & Humid Sensor',
+        author: 'ArtronShop CO.,LTD.',
+        description: '(ModbusMaster Request) Get temperature and humidity from ATS-TH, ATS-TH-BOX, ATS-TH-DISPLAY',
+        version: '1.0.0',
+        depends: [ ],
+        src: atsthExtension,
     },
 ];
 
