@@ -24,6 +24,7 @@ import atsthExtension from "./ATS-TH.flowext";
 import atsluxExtension from "./ATS-LUX.flowext";
 import atsco2Extension from "./ATS-CO2.flowext";
 import bh1750Extension from "./BH1750.flowext";
+import soilRS485Extension from "./SoilRS485.flowext";
 
 const extensionIndex: ExtensionProps[] = [
     {
@@ -237,6 +238,15 @@ const extensionIndex: ExtensionProps[] = [
         version: '1.0.0',
         depends: [ 'ArtronShop_BH1750@1.0.0' ],
         src: bh1750Extension,
+    },
+    {
+        id: 'SoilRS485',
+        name: 'Soil Sensor RS485 (TH-EC-PH-NPK)',
+        author: 'ArtronShop CO.,LTD.',
+        description: '(ModbusMaster Request) Read soil moisture, temperature, EC, PH, and NPK from RS485 soil sensor',
+        version: '1.0.0',
+        depends: [],
+        src: soilRS485Extension,
     },
 ];
 
