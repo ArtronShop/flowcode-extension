@@ -26,6 +26,7 @@ import atsco2Extension from "./ATS-CO2.flowext";
 import bh1750Extension from "./BH1750.flowext";
 import soilRS485Extension from "./SoilRS485.flowext";
 import a01nyubExtension from "./A01NYUB.flowext";
+import djlk003abExtension from "./DJLK003AB.flowext";
 
 const extensionIndex: ExtensionProps[] = [
     {
@@ -257,6 +258,15 @@ const extensionIndex: ExtensionProps[] = [
         version: '1.0.0',
         depends: [],
         src: a01nyubExtension,
+    },
+    {
+        id: 'DJLK-003AB',
+        name: 'DJLK-003AB Waterproof Ultrasonic Sensor',
+        author: 'ArtronShop CO.,LTD.',
+        description: '(ModbusMaster Request) Read distance (mm) from DJLK-003AB waterproof ultrasonic sensor',
+        version: '1.0.0',
+        depends: [],
+        src: djlk003abExtension,
     },
 ];
 
