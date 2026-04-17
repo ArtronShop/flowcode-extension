@@ -21,6 +21,9 @@ import websocketExtension from "./WebSocket.flowext";
 import otaExtension from "./OTA.flowext";
 import rgbMatrixExtension from "./RGBMatrix.flowext";
 import atsthExtension from "./ATS-TH.flowext";
+import atsluxExtension from "./ATS-LUX.flowext";
+import atsco2Extension from "./ATS-CO2.flowext";
+import bh1750Extension from "./BH1750.flowext";
 
 const extensionIndex: ExtensionProps[] = [
     {
@@ -207,6 +210,33 @@ const extensionIndex: ExtensionProps[] = [
         version: '1.0.0',
         depends: [ ],
         src: atsthExtension,
+    },
+    {
+        id: 'ATS-LUX',
+        name: 'ATS-LUX Light Sensor',
+        author: 'ArtronShop CO.,LTD.',
+        description: '(ModbusMaster Request) Get Light Illuminance from ATS-LUX',
+        version: '1.0.0',
+        depends: [ ],
+        src: atsluxExtension,
+    },
+    {
+        id: 'ATS-CO2',
+        name: 'ATS-CO2 CO2 & Temp & Humid Sensor',
+        author: 'ArtronShop CO.,LTD.',
+        description: '(ModbusMaster Request) Get co2, temperature and humidity from ATS-CO2',
+        version: '1.0.0',
+        depends: [ ],
+        src: atsco2Extension,
+    },
+    {
+        id: 'BH1750',
+        name: 'BH1750 Light Sensor',
+        author: 'ArtronShop CO.,LTD.',
+        description: 'Read light illuminance (lux) from BH1750 sensor via I2C',
+        version: '1.0.0',
+        depends: [ 'ArtronShop_BH1750@1.0.0' ],
+        src: bh1750Extension,
     },
 ];
 
