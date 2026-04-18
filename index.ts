@@ -28,6 +28,7 @@ import soilRS485Extension from "./SoilRS485.flowext";
 import a01nyubExtension from "./A01NYUB.flowext";
 import djlk003abExtension from "./DJLK003AB.flowext";
 import ultrasonicPulseExtension from "./UltrasonicPulse.flowext";
+import pms7003Extension from "./PMS7003.flowext";
 
 const extensionIndex: ExtensionProps[] = [
     {
@@ -276,6 +277,14 @@ const extensionIndex: ExtensionProps[] = [
         description: 'Read distance from pulse-based ultrasonic sensors (HC-SR04 and compatible) via TRIG/ECHO pins',
         version: '1.0.0',
         src: ultrasonicPulseExtension,
+    },
+    {
+        id: 'PMS7003',
+        name: 'PMS7003 Dust Sensor',
+        author: 'ArtronShop CO.,LTD.',
+        description: 'Read PM1.0, PM2.5, PM10 from PMS7003 particulate matter sensor via UART (non-blocking, parsed in loop)',
+        version: '1.0.0',
+        src: pms7003Extension,
     },
 ];
 
