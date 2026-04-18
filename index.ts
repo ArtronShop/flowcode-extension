@@ -27,6 +27,7 @@ import bh1750Extension from "./BH1750.flowext";
 import soilRS485Extension from "./SoilRS485.flowext";
 import a01nyubExtension from "./A01NYUB.flowext";
 import djlk003abExtension from "./DJLK003AB.flowext";
+import ultrasonicPulseExtension from "./UltrasonicPulse.flowext";
 
 const extensionIndex: ExtensionProps[] = [
     {
@@ -267,6 +268,14 @@ const extensionIndex: ExtensionProps[] = [
         version: '1.0.0',
         depends: [],
         src: djlk003abExtension,
+    },
+    {
+        id: 'UltrasonicPulse',
+        name: 'Ultrasonic Sensor (Pulse)',
+        author: 'ArtronShop CO.,LTD.',
+        description: 'Read distance from pulse-based ultrasonic sensors (HC-SR04 and compatible) via TRIG/ECHO pins',
+        version: '1.0.0',
+        src: ultrasonicPulseExtension,
     },
 ];
 
