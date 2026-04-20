@@ -1,4 +1,4 @@
-import type { BlockCategory, ParamVarname } from '../types.js';
+import type { BlockCategory } from '../types.js';
 
 const COLOR = '#f59e0b';
 
@@ -10,7 +10,7 @@ function serialConfig(dataBits: string, parity: string, stopBits: string): strin
 
 // ─── Register common globals/functions per modbus instance ──────────────────
 function registerModbusInstance(
-    dePin: string,
+    _dePin: string,
     registerPreprocessor: (d: string) => void,
     registerGlobal: (d: string) => void,
     registerFunction: (h: string, b: string, decl?: string) => void,
@@ -30,6 +30,113 @@ function registerModbusInstance(
         `  if (modbus_de_pin >= 0) digitalWrite(modbus_de_pin, LOW);`,
         `void modbus_postTx();`
     );
+}
+
+// ─── Endian helpers ──────────────────────────────────────────────────────────
+function modbusReadExpr(id: string, pad: string, rawType: string, endian: string): string {
+    const wordSwap = endian.startsWith('LE'); // swap word order (register 0 ↔ 1)
+    const byteSwap = endian.endsWith('-SWAP');  // swap bytes within each word
+    const raw = (i: number) => `modbus.getResponseBuffer(${i})`;
+    const buf = (i: number) => byteSwap
+        ? `(uint16_t)((${raw(i)} >> 8) | (${raw(i)} << 8))`
+        : raw(i);
+    if (rawType === 'float') {
+        const conv_union = [
+            `union {`,
+            `  uint16_t u16[2];`,
+            `  float f32;`,
+            `} ${id}_conv;`
+        ];
+
+        // u[0]=LSW, u[1]=MSW on little-endian MCU
+        // no word swap: buf[0]=MSW→u[1], buf[1]=LSW→u[0]
+        // word swap:    buf[0]=LSW→u[0], buf[1]=MSW→u[1]
+        const [u0, u1] = wordSwap ? [buf(0), buf(1)] : [buf(1), buf(0)];
+        return [
+            ...conv_union,
+            `${id}_conv.u16[0] = ${u0};`,
+            `${id}_conv.u16[1] = ${u1};`,
+            `float ${id} = ${id}_conv.f32;`,
+        ].map(l => `${pad}  ${l}`).join('\n');
+    }
+    if (rawType === 'double') {
+        const conv_union = [
+            `union {`,
+            `  uint16_t u16[4];`,
+            `  double f64;`,
+            `} ${id}_conv;`
+        ];
+        // u[0]=LSW..u[3]=MSW; no word swap: buf[0]=u[3]..buf[3]=u[0]
+        const uIdx = wordSwap ? [0, 1, 2, 3] : [3, 2, 1, 0];
+        return [
+            ...conv_union,
+            ...uIdx.map((ui, bi) => `${id}_conv.u16[${ui}] = ${buf(bi)};`),
+            `double ${id} = ${id}_conv.f64;`,
+        ].map(l => `${pad}  ${l}`).join('\n');
+    }
+    if (rawType === 'uint32' || rawType === 'int32') {
+        const conv_union = [
+            `union {`,
+            `  uint16_t u16[2];`,
+            `  uint32_t u32;`,
+            `  int32_t i32;`,
+            `} ${id}_conv;`
+        ];
+        const [u0, u1] = wordSwap ? [buf(0), buf(1)] : [buf(1), buf(0)];
+        return [
+            ...conv_union,
+            `${id}_conv.u16[0] = ${u0};`,
+            `${id}_conv.u16[1] = ${u1};`,
+            `${rawType}_t ${id} = ${id}_conv.${rawType === 'uint32' ? 'u32' : 'i32'};`,
+        ].map(l => `${pad}  ${l}`).join('\n');
+    }
+    if (rawType === 'bool') return `${pad}  bool ${id} = (modbus.getResponseBuffer(0) & 0x01) != 0;`;
+    if (rawType === 'int16') return `${pad}  int16_t ${id} = (int16_t)modbus.getResponseBuffer(0);`;
+    return `${pad}  uint16_t ${id} = modbus.getResponseBuffer(0);`;
+}
+
+
+function modbusWriteLines(id: string, pad: string, writeType: string, dataType: string, address: string, coilCount: string, valueExpr: string, endian: string): string[] {
+    const wordSwap = endian.endsWith('-SWAP');
+    const byteSwap = endian.startsWith('LE');
+    const sw = (e: string) => byteSwap ? `(uint16_t)((${e} >> 8) | (${e} << 8))` : e;
+    if (writeType === 'single_coil') return [
+        `${pad}${id}_result = (uint8_t)modbus.writeSingleCoil(${address}, (${valueExpr}) ? 0xFF00 : 0x0000);`,
+    ];
+    if (writeType === 'multi_coils') return [
+        `${pad}modbus.setTransmitBuffer(0, (uint16_t)(${valueExpr}));`,
+        `${pad}${id}_result = (uint8_t)modbus.writeMultipleCoils(${address}, ${coilCount});`,
+    ];
+    const isMulti = writeType === 'multi_registers';
+    if (dataType === 'float32') {
+        // u[0]=LSW, u[1]=MSW; no word swap → send MSW first
+        const [b0, b1] = wordSwap
+            ? [sw(`${id}_conv.u[0]`), sw(`${id}_conv.u[1]`)]
+            : [sw(`${id}_conv.u[1]`), sw(`${id}_conv.u[0]`)];
+        return [
+            `${pad}{ union { float f; uint16_t u[2]; } ${id}_conv; ${id}_conv.f = (float)(${valueExpr});`,
+            `${pad}  modbus.setTransmitBuffer(0, ${b0});`,
+            `${pad}  modbus.setTransmitBuffer(1, ${b1});`,
+            `${pad}  ${id}_result = (uint8_t)modbus.writeMultipleRegisters(${address}, 2); }`,
+        ];
+    }
+    if (dataType === 'int32') {
+        const hiW = `(uint16_t)(${id}_i32 >> 16)`;
+        const loW = `(uint16_t)(${id}_i32 & 0xFFFF)`;
+        const [b0, b1] = wordSwap ? [sw(loW), sw(hiW)] : [sw(hiW), sw(loW)];
+        return [
+            `${pad}{ uint32_t ${id}_i32 = (uint32_t)(int32_t)(${valueExpr});`,
+            `${pad}  modbus.setTransmitBuffer(0, ${b0});`,
+            `${pad}  modbus.setTransmitBuffer(1, ${b1});`,
+            `${pad}  ${id}_result = (uint8_t)modbus.writeMultipleRegisters(${address}, 2); }`,
+        ];
+    }
+    return isMulti ? [
+        `${pad}modbus.setTransmitBuffer(0, (uint16_t)(${valueExpr}));`,
+        `${pad}${id}_result = (uint8_t)modbus.writeMultipleRegisters(${address}, 1);`,
+    ] : [
+        `${pad}${id}_result = (uint8_t)modbus.writeSingleRegister(${address}, (uint16_t)(${valueExpr}));`,
+    ];
 }
 
 const modbusMasterExtension: BlockCategory = {
@@ -114,7 +221,7 @@ const modbusMasterExtension: BlockCategory = {
                     default: '1',
                 },
             ],
-            toCode({ pad, block, safeId, params, registerPreprocessor, registerGlobal, registerFunction }) {
+            toCode({ pad, params, registerPreprocessor, registerGlobal, registerFunction }) {
                 const serialPt = params.serial_port ?? 'Serial2';
                 const rxPin = params.rx_pin ?? '16';
                 const txPin = params.tx_pin ?? '17';
@@ -145,6 +252,7 @@ const modbusMasterExtension: BlockCategory = {
             color: COLOR,
             icon: '📖',
             category: 'Modbus Master',
+            requires: ['modbus_config'],
             description: 'อ่านค่าจาก Modbus Slave\nรองรับ Coils, Discrete Inputs, Input Registers, Holding Registers',
             inputs: [{ id: 'in', type: 'input', label: '➜', dataType: 'any' }],
             outputs: [],
@@ -222,44 +330,23 @@ const modbusMasterExtension: BlockCategory = {
                 const regType = params.register_type ?? 'holding';
                 const address = params.address ?? '0';
                 const rawType = (regType === 'coil' || regType === 'discrete') ? 'bool' : (params.data_type ?? 'int16');
+                const endian = params.endian ?? 'BE';
                 const id = safeId(block.id);
 
-                // Register shared globals/functions (idempotent via registerGlobal dedup)
                 registerModbusInstance('-1', registerPreprocessor, registerGlobal, registerFunction);
-
-                // Number of registers to read
-                const isFloat32 = rawType === 'float32';
+                const isFloat = rawType === 'float';
+                const isDouble = rawType === 'double';
                 const isInt32 = rawType === 'int32';
-                const isBool = rawType === 'bool';
-                const qty = (isFloat32 || isInt32) ? 2 : 1;
+                const isUint32 = rawType === 'uint32';
+                const qty = isDouble ? 4 : (isFloat || isInt32 || isUint32) ? 2 : 1;
 
-                // Read function call
                 let readCall: string;
                 if (regType === 'holding') readCall = `modbus.readHoldingRegisters(${address}, ${qty})`;
                 else if (regType === 'input') readCall = `modbus.readInputRegisters(${address}, ${qty})`;
                 else if (regType === 'coil') readCall = `modbus.readCoils(${address}, 1)`;
                 else readCall = `modbus.readDiscreteInputs(${address}, 1)`;
 
-                // Value extraction
-                let valueExpr: string;
-                if (isFloat32) {
-                    valueExpr = [
-                        `union { float f; uint16_t u[2]; } ${id}_conv;`,
-                        `${id}_conv.u[0] = modbus.getResponseBuffer(0);`,
-                        `${id}_conv.u[1] = modbus.getResponseBuffer(1);`,
-                        `float ${id} = ${id}_conv.f;`,
-                    ].map(l => `${pad}  ${l}`).join('\n');
-                } else if (isInt32) {
-                    valueExpr = [
-                        `int32_t ${id} = (int32_t)((uint32_t)modbus.getResponseBuffer(1) << 16 | modbus.getResponseBuffer(0));`,
-                    ].map(l => `${pad}  ${l}`).join('\n');
-                } else if (isBool) {
-                    valueExpr = `${pad}  bool ${id} = (modbus.getResponseBuffer(0) & 0x01) != 0;`;
-                } else if (rawType === 'int16') {
-                    valueExpr = `${pad}  int16_t ${id} = (int16_t)modbus.getResponseBuffer(0);`;
-                } else {
-                    valueExpr = `${pad}  uint16_t ${id} = modbus.getResponseBuffer(0);`;
-                }
+                const valueExpr = modbusReadExpr(id, pad, rawType, endian);
 
                 return {
                     parts: [
@@ -284,6 +371,7 @@ const modbusMasterExtension: BlockCategory = {
             color: COLOR,
             icon: '✏️',
             category: 'Modbus Master',
+            requires: ['modbus_config'],
             description: 'เขียนค่าไปยัง Modbus Slave\nรองรับ Single Coil, Single/Multiple Holding Registers',
             inputs: [
                 { id: 'in', type: 'input', label: '➜', dataType: 'any', description: 'จุดต่อสายบล็อกก่อนหน้า' },
@@ -336,6 +424,18 @@ const modbusMasterExtension: BlockCategory = {
                     id: 'value', label: 'Value', type: 'text',
                     default: '0', description: 'ค่าที่เขียน (ใช้เมื่อไม่มีสายต่อเข้า Value port)',
                 },
+                {
+                    id: 'endian', type: 'option', label: 'Endian',
+                    options: [
+                        { label: 'Big-endian', value: 'BE' },
+                        { label: 'Big-endian byte swap', value: 'BE-SWAP' },
+                        { label: 'Little-endian', value: 'LE' },
+                        { label: 'Little-endian byte swap', value: 'LE-SWAP' },
+                    ],
+                    default: 'BE',
+                    description: 'ลำดับไบต์ Big-endian / Little-endian / Swap',
+                    hidden: ({ params }) => params.write_type === 'single_coil' || params.write_type === 'multi_coils' || (params.data_type !== 'int32' && params.data_type !== 'float32'),
+                },
             ],
             toCode({ pad, block, safeId, params, resolveInput, registerPreprocessor, registerGlobal, registerFunction }) {
                 const slaveId = params.slave_id ?? '1';
@@ -344,71 +444,18 @@ const modbusMasterExtension: BlockCategory = {
                 const dataType = params.data_type ?? 'int16';
                 const coilCount = params.coil_count ?? '8';
                 const fallback = params.value ?? '0';
+                const endian = params.endian ?? 'BE';
                 const id = safeId(block.id);
 
                 const valueExpr = resolveInput('value') ?? fallback;
 
                 registerModbusInstance('-1', registerPreprocessor, registerGlobal, registerFunction);
-
-                let writeLines: string[];
-                if (writeType === 'single_coil') {
-                    writeLines = [
-                        `${pad}uint16_t ${id}_coil_val = (${valueExpr}) ? 0xFF00 : 0x0000;`,
-                        `${pad}uint8_t ${id}_result = modbus.writeSingleCoil(${address}, ${id}_coil_val);`,
-                    ];
-                } else if (writeType === 'multi_coils') {
-                    writeLines = [
-                        `${pad}modbus.setTransmitBuffer(0, (uint16_t)(${valueExpr}));`,
-                        `${pad}uint8_t ${id}_result = modbus.writeMultipleCoils(${address}, ${coilCount});`,
-                    ];
-                } else if (writeType === 'single_register') {
-                    if (dataType === 'float32') {
-                        // float → 2 registers via writeMultipleRegisters
-                        writeLines = [
-                            `${pad}union { float f; uint16_t u[2]; } ${id}_conv; ${id}_conv.f = (float)(${valueExpr});`,
-                            `${pad}modbus.setTransmitBuffer(0, ${id}_conv.u[0]);`,
-                            `${pad}modbus.setTransmitBuffer(1, ${id}_conv.u[1]);`,
-                            `${pad}uint8_t ${id}_result = modbus.writeMultipleRegisters(${address}, 2);`,
-                        ];
-                    } else if (dataType === 'int32') {
-                        writeLines = [
-                            `${pad}uint32_t ${id}_i32 = (uint32_t)(int32_t)(${valueExpr});`,
-                            `${pad}modbus.setTransmitBuffer(0, (uint16_t)(${id}_i32 & 0xFFFF));`,
-                            `${pad}modbus.setTransmitBuffer(1, (uint16_t)(${id}_i32 >> 16));`,
-                            `${pad}uint8_t ${id}_result = modbus.writeMultipleRegisters(${address}, 2);`,
-                        ];
-                    } else {
-                        writeLines = [
-                            `${pad}uint8_t ${id}_result = modbus.writeSingleRegister(${address}, (uint16_t)(${valueExpr}));`,
-                        ];
-                    }
-                } else {
-                    // multi_registers
-                    if (dataType === 'float32') {
-                        writeLines = [
-                            `${pad}union { float f; uint16_t u[2]; } ${id}_conv; ${id}_conv.f = (float)(${valueExpr});`,
-                            `${pad}modbus.setTransmitBuffer(0, ${id}_conv.u[0]);`,
-                            `${pad}modbus.setTransmitBuffer(1, ${id}_conv.u[1]);`,
-                            `${pad}uint8_t ${id}_result = modbus.writeMultipleRegisters(${address}, 2);`,
-                        ];
-                    } else if (dataType === 'int32') {
-                        writeLines = [
-                            `${pad}uint32_t ${id}_i32 = (uint32_t)(int32_t)(${valueExpr});`,
-                            `${pad}modbus.setTransmitBuffer(0, (uint16_t)(${id}_i32 & 0xFFFF));`,
-                            `${pad}modbus.setTransmitBuffer(1, (uint16_t)(${id}_i32 >> 16));`,
-                            `${pad}uint8_t ${id}_result = modbus.writeMultipleRegisters(${address}, 2);`,
-                        ];
-                    } else {
-                        writeLines = [
-                            `${pad}modbus.setTransmitBuffer(0, (uint16_t)(${valueExpr}));`,
-                            `${pad}uint8_t ${id}_result = modbus.writeMultipleRegisters(${address}, 1);`,
-                        ];
-                    }
-                }
+                const writeLines = modbusWriteLines(id, pad, writeType, dataType, address, coilCount, valueExpr, endian);
 
                 return {
                     parts: [
                         [`${pad}modbus.begin(${slaveId}, *modbus_serial);`],
+                        [`${pad}uint8_t ${id}_result = 0;`],
                         writeLines,
                         [`${pad}if (${id}_result == ModbusMaster::ku8MBSuccess) {`],
                         { portId: 'success', depthDelta: 1 },
