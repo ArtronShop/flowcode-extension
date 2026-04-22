@@ -19,7 +19,6 @@ import lineExtension from "./LINE.flowext";
 import lowPowerExtension from "./LowPower.flowext";
 import websocketExtension from "./WebSocket.flowext";
 import otaExtension from "./OTA.flowext";
-import rgbMatrixExtension from "./RGBMatrix.flowext";
 import atsthExtension from "./ATS-TH.flowext";
 import atsluxExtension from "./ATS-LUX.flowext";
 import atsco2Extension from "./ATS-CO2.flowext";
@@ -197,15 +196,6 @@ const extensionIndex: ExtensionProps[] = [
         description: 'Over-the-Air firmware update via WiFi using ArduinoOTA (built-in ESP32 Arduino core)',
         version: '1.0.0',
         src: otaExtension,
-    },
-    {
-        id: 'RGBMatrix',
-        name: 'RGB LED Matrix (HUB75)',
-        author: 'ArtronShop CO.,LTD.',
-        description: 'Drive HUB75 RGB LED matrix panels — draw pixels, lines, rectangles, and text',
-        version: '1.0.0',
-        depends: [ 'Adafruit Protomatter@1.7.1', 'Adafruit GFX Library@1.12.6' ],
-        src: rgbMatrixExtension,
     },
     {
         id: 'ATS-TH',
