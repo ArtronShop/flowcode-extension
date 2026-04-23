@@ -30,6 +30,9 @@ import ultrasonicPulseExtension from "./UltrasonicPulse.flowext";
 import pms7003Extension from "./PMS7003.flowext";
 import wifiManagerExtension from "./WiFiManager.flowext";
 import smartConfigExtension from "./SmartConfig.flowext";
+import w5500Extension from "./W5500.flowext";
+import arduinoEthernetExtension from "./ArduinoEthernet.flowext";
+import canBusExtension from "./CANBus.flowext";
 
 const extensionIndex: ExtensionProps[] = [
     {
@@ -294,6 +297,31 @@ const extensionIndex: ExtensionProps[] = [
         description: 'Provision WiFi credentials wirelessly from a smartphone using ESP-Touch / AirKiss (built-in ESP32, no extra library)',
         version: '1.0.0',
         src: smartConfigExtension,
+    },
+    {
+        id: 'W5500',
+        name: 'W5500 Ethernet',
+        author: 'ArtronShop CO.,LTD.',
+        description: 'Wired Ethernet via W5500 SPI module using built-in ESP32 ETH library — Begin, On Connected, On Disconnected, Is Connected',
+        version: '1.0.0',
+        src: w5500Extension,
+    },
+    {
+        id: 'ArduinoEthernet',
+        name: 'Ethernet (Arduino)',
+        author: 'ArtronShop CO.,LTD.',
+        description: 'Wired Ethernet using Arduino Ethernet library — supports W5100/W5200/W5500, DHCP or Static IP, Begin, Is Connected, Local IP',
+        version: '1.0.0',
+        depends: ['Ethernet@2.0.2'],
+        src: arduinoEthernetExtension,
+    },
+    {
+        id: 'CANBus',
+        name: 'CAN Bus (TWAI)',
+        author: 'ArtronShop CO.,LTD.',
+        description: 'CAN bus via ESP32 built-in TWAI driver (no extra library) — Begin, Send, On Receive, Message ID/DLC/Byte',
+        version: '1.0.0',
+        src: canBusExtension,
     },
 ];
 
