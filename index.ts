@@ -28,6 +28,7 @@ import a01nyubExtension from "./A01NYUB.flowext";
 import djlk003abExtension from "./DJLK003AB.flowext";
 import ultrasonicPulseExtension from "./UltrasonicPulse.flowext";
 import pms7003Extension from "./PMS7003.flowext";
+import wifiManagerExtension from "./WiFiManager.flowext";
 
 const extensionIndex: ExtensionProps[] = [
     {
@@ -275,6 +276,15 @@ const extensionIndex: ExtensionProps[] = [
         description: 'Read PM1.0, PM2.5, PM10 from PMS7003 particulate matter sensor via UART (non-blocking, parsed in loop)',
         version: '1.0.0',
         src: pms7003Extension,
+    },
+    {
+        id: 'WiFiManager',
+        name: 'WiFiManager',
+        author: 'ArtronShop CO.,LTD.',
+        description: 'WiFi configuration via captive portal (AP mode). AutoConnect, Config Portal, Reset settings.',
+        version: '1.0.0',
+        depends: ['WiFiManager@2.0.17'],
+        src: wifiManagerExtension,
     },
 ];
 
