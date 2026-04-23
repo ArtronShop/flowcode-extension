@@ -29,6 +29,7 @@ import djlk003abExtension from "./DJLK003AB.flowext";
 import ultrasonicPulseExtension from "./UltrasonicPulse.flowext";
 import pms7003Extension from "./PMS7003.flowext";
 import wifiManagerExtension from "./WiFiManager.flowext";
+import smartConfigExtension from "./SmartConfig.flowext";
 
 const extensionIndex: ExtensionProps[] = [
     {
@@ -285,6 +286,14 @@ const extensionIndex: ExtensionProps[] = [
         version: '1.0.0',
         depends: ['WiFiManager@2.0.17'],
         src: wifiManagerExtension,
+    },
+    {
+        id: 'SmartConfig',
+        name: 'SmartConfig',
+        author: 'ArtronShop CO.,LTD.',
+        description: 'Provision WiFi credentials wirelessly from a smartphone using ESP-Touch / AirKiss (built-in ESP32, no extra library)',
+        version: '1.0.0',
+        src: smartConfigExtension,
     },
 ];
 
