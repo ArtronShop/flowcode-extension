@@ -33,6 +33,7 @@ import smartConfigExtension from "./SmartConfig.flowext";
 import w5500Extension from "./W5500.flowext";
 import arduinoEthernetExtension from "./ArduinoEthernet.flowext";
 import canBusExtension from "./CANBus.flowext";
+import r420Extension from "./R420mA.flowext";
 
 const extensionIndex: ExtensionProps[] = [
     {
@@ -319,9 +320,18 @@ const extensionIndex: ExtensionProps[] = [
         id: 'CANBus',
         name: 'CAN Bus (TWAI)',
         author: 'ArtronShop CO.,LTD.',
-        description: 'CAN bus via ESP32 built-in TWAI driver (no extra library) — Begin, Send, On Receive, Message ID/DLC/Byte',
+        description: 'CAN bus via ESP32 built-in TWAI driver',
         version: '1.0.0',
         src: canBusExtension,
+    },
+    {
+        id: '4-20mA',
+        name: '4-20mA Receiver',
+        author: 'ArtronShop CO.,LTD.',
+        description: 'Read 4-20mA current loop via AS-4-20mA / IOXESP32 4-20mA shield',
+        version: '1.0.0',
+        depends: ['IOXESP32_4-20mA_Receiver@1.1.0'],
+        src: r420Extension,
     },
 ];
 
