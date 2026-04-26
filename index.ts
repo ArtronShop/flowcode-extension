@@ -34,6 +34,8 @@ import w5500Extension from "./W5500.flowext";
 import arduinoEthernetExtension from "./ArduinoEthernet.flowext";
 import canBusExtension from "./CANBus.flowext";
 import r420Extension from "./R420mA.flowext";
+import nvsExtension from "./NVS.flowext";
+import btExtension from "./BluetoothSerial.flowext";
 
 const extensionIndex: ExtensionProps[] = [
     {
@@ -323,6 +325,22 @@ const extensionIndex: ExtensionProps[] = [
         description: 'CAN bus via ESP32 built-in TWAI driver',
         version: '1.0.0',
         src: canBusExtension,
+    },
+    {
+        id: 'NVS',
+        name: 'NVS (Preferences)',
+        author: 'ArtronShop CO.,LTD.',
+        description: 'Non-Volatile Storage — Begin, End, Put, Get, Is Key, Remove, Clear',
+        version: '1.0.0',
+        src: nvsExtension,
+    },
+    {
+        id: 'BluetoothSerial',
+        name: 'Bluetooth Serial',
+        author: 'ArtronShop CO.,LTD.',
+        description: 'Classic Bluetooth SPP using built-in BluetoothSerial — Begin, Print, Println, Printf, On Receive, Available, Read String (no extra library)',
+        version: '1.0.0',
+        src: btExtension,
     },
     {
         id: '4-20mA',
