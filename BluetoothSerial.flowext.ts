@@ -201,7 +201,7 @@ const btExtension: BlockCategory = {
                     inputs: [
                         { id: 'inp', type: 'input', label: '➜', dataType: 'void', description: 'สายลำดับการทำงาน' },
                         ...specs.map((spec, i) => ({
-                            id: `arg${i + 1}`, type: 'input' as const, label: `Arg ${i + 1}`, dataType: specifierToDataType(spec) as import('./types.js').DataType
+                            id: `arg${i + 1}`, type: 'input' as const, label: `Arg ${i + 1}`, dataType: specifierToDataType(spec) as import('../types.js').DataType
                         }))
                     ]
                 };
