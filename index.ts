@@ -36,6 +36,8 @@ import canBusExtension from "./CANBus.flowext";
 import r420Extension from "./R420mA.flowext";
 import nvsExtension from "./NVS.flowext";
 import btExtension from "./BluetoothSerial.flowext";
+import buttonExtension from "./Button.flowext";
+import dcMotorExtension from "./DCMotor.flowext";
 
 const extensionIndex: ExtensionProps[] = [
     {
@@ -343,12 +345,28 @@ const extensionIndex: ExtensionProps[] = [
         src: btExtension,
     },
     {
+        id: 'Button',
+        name: 'Button',
+        author: 'ArtronShop CO.,LTD.',
+        description: 'Push button handler with debounce — On Pressed, On Click, On Long Click (800ms). Supports Active HIGH/LOW with auto PULLUP/PULLDOWN (no extra library)',
+        version: '1.0.0',
+        src: buttonExtension,
+    },
+    {
+        id: 'DCMotor',
+        name: 'DC Motor',
+        author: 'ArtronShop CO.,LTD.',
+        description: 'DC motor control via L298N/L293D or any driver — OFF/ON/Adjust Speed, 1-Pin (PWM) or 2-Pin (IN1/IN2) with direction (no extra library)',
+        version: '1.0.0',
+        src: dcMotorExtension,
+    },
+    {
         id: '4-20mA',
         name: '4-20mA Receiver',
         author: 'ArtronShop CO.,LTD.',
         description: 'Read 4-20mA current loop via AS-4-20mA / IOXESP32 4-20mA shield',
         version: '1.0.0',
-        depends: ['IOXESP32_4-20mA_Receiver@1.1.0'],
+        depends: ['IOXESP32_4-20mA_Receiver@1.1.1'],
         src: r420Extension,
     },
 ];
