@@ -38,6 +38,7 @@ import nvsExtension from "./NVS.flowext";
 import btExtension from "./BluetoothSerial.flowext";
 import buttonExtension from "./Button.flowext";
 import dcMotorExtension from "./DCMotor.flowext";
+import keypadExtension from "./Keypad.flowext";
 
 const extensionIndex: ExtensionProps[] = [
     {
@@ -359,6 +360,15 @@ const extensionIndex: ExtensionProps[] = [
         description: 'DC motor control via L298N/L293D or any driver — OFF/ON/Adjust Speed, 1-Pin (PWM) or 2-Pin (IN1/IN2) with direction (no extra library)',
         version: '1.0.0',
         src: dcMotorExtension,
+    },
+    {
+        id: 'Keypad',
+        name: 'Keypad',
+        author: 'ArtronShop CO.,LTD.',
+        description: 'Matrix keypad (4×4 / 4×3) — On Press trigger, Read flow block, Key value expression. Configurable pins and key layout.',
+        version: '1.0.0',
+        depends: ['Keypad@3.1.1'],
+        src: keypadExtension,
     },
     {
         id: '4-20mA',
