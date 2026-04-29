@@ -39,6 +39,7 @@ import btExtension from "./BluetoothSerial.flowext";
 import buttonExtension from "./Button.flowext";
 import dcMotorExtension from "./DCMotor.flowext";
 import keypadExtension from "./Keypad.flowext";
+import waterFlowExtension from "./WaterFlow.flowext";
 
 const extensionIndex: ExtensionProps[] = [
     {
@@ -83,7 +84,7 @@ const extensionIndex: ExtensionProps[] = [
         author: 'ArtronShop CO.,LTD.',
         description: 'Read/Write Coils and Registers via RS485',
         version: '1.0.0',
-        depends: [ 'ModbusMaster@2.0.1' ],
+        depends: [ 'ModbusMasterPlus@2.1.0' ],
         src: modbusMasterExtension,
     },
     {
@@ -369,6 +370,14 @@ const extensionIndex: ExtensionProps[] = [
         version: '1.0.0',
         depends: ['Keypad@3.1.1'],
         src: keypadExtension,
+    },
+    {
+        id: 'WaterFlow',
+        name: 'Water Flow Sensor (Pulse)',
+        author: 'ArtronShop CO.,LTD.',
+        description: 'Pulse-based water flow sensor — Begin, Read (L/min or total L), Reset',
+        version: '1.0.0',
+        src: waterFlowExtension,
     },
     {
         id: '4-20mA',

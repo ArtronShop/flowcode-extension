@@ -35,7 +35,7 @@ function registerWFHelper(
 
 const waterFlowExtension: BlockCategory = {
     id: 'water-flow',
-    name: 'Water Flow (Pulse)',
+    name: 'Water Flow Sensor (Pulse)',
     blocks: [
 
         // ─── Begin ───────────────────────────────────────────────────────
