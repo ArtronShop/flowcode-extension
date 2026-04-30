@@ -101,7 +101,7 @@ function modbusWriteLines(id: string, pad: string, writeType: string, dataType: 
     const byteSwap = endian.startsWith('LE');
     const sw = (e: string) => byteSwap ? `(uint16_t)((${e} >> 8) | (${e} << 8))` : e;
     if (writeType === 'single_coil') return [
-        `${pad}${id}_result = (uint8_t)modbus.writeSingleCoil(${address}, (${valueExpr}) ? 0xFF00 : 0x0000);`,
+        `${pad}${id}_result = (uint8_t)modbus.writeSingleCoil(${address}, (${valueExpr}) !== 0 ? 1 : 0);`,
     ];
     if (writeType === 'multi_coils') return [
         `${pad}modbus.setTransmitBuffer(0, (uint16_t)(${valueExpr}));`,
