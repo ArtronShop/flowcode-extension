@@ -40,6 +40,7 @@ import buttonExtension from "./Button.flowext";
 import dcMotorExtension from "./DCMotor.flowext";
 import keypadExtension from "./Keypad.flowext";
 import waterFlowExtension from "./WaterFlow.flowext";
+import stepMotorExtension from "./StepMotor.flowext";
 
 const extensionIndex: ExtensionProps[] = [
     {
@@ -378,6 +379,15 @@ const extensionIndex: ExtensionProps[] = [
         description: 'Pulse-based water flow sensor — Begin, Read (L/min or total L), Reset',
         version: '1.0.0',
         src: waterFlowExtension,
+    },
+    {
+        id: 'StepMotor',
+        name: 'Step Motor (Step/Dir/EN)',
+        author: 'ArtronShop CO.,LTD.',
+        description: 'Stepper motor via Step+Dir+EN driver (A4988, DRV8825, TB6600) — Begin, Move, Move To, Set Speed, Stop, Enable, Is Running, Position',
+        version: '1.0.0',
+        depends: ['AccelStepper@1.64.0'],
+        src: stepMotorExtension,
     },
     {
         id: '4-20mA',
