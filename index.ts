@@ -86,7 +86,7 @@ const extensionIndex: ExtensionProps[] = [
         author: 'ArtronShop CO.,LTD.',
         description: 'Read/Write Coils and Registers via RS485',
         version: '1.0.0',
-        depends: [ 'ModbusMasterPlus@2.1.0' ],
+        depends: [ 'ModbusMasterPlus@2.1.1' ],
         src: modbusMasterExtension,
     },
     {
@@ -96,6 +96,7 @@ const extensionIndex: ExtensionProps[] = [
         description: '(ModbusMaster Request) Get temperature and humidity from XY-MD02 sensor',
         version: '1.0.0',
         depends: [ ],
+        requires: [ 'ModbusMaster' ],
         src: xymd02Extension,
     },
     {
@@ -218,6 +219,7 @@ const extensionIndex: ExtensionProps[] = [
         description: '(ModbusMaster Request) Get temperature and humidity from ATS-TH, ATS-TH-BOX, ATS-TH-DISPLAY',
         version: '1.0.0',
         depends: [ ],
+        requires: [ 'ModbusMaster' ],
         src: atsthExtension,
     },
     {
@@ -227,6 +229,7 @@ const extensionIndex: ExtensionProps[] = [
         description: '(ModbusMaster Request) Get Light Illuminance from ATS-LUX',
         version: '1.0.0',
         depends: [ ],
+        requires: [ 'ModbusMaster' ],
         src: atsluxExtension,
     },
     {
@@ -236,6 +239,7 @@ const extensionIndex: ExtensionProps[] = [
         description: '(ModbusMaster Request) Get co2, temperature and humidity from ATS-CO2',
         version: '1.0.0',
         depends: [ ],
+        requires: [ 'ModbusMaster' ],
         src: atsco2Extension,
     },
     {
@@ -254,6 +258,7 @@ const extensionIndex: ExtensionProps[] = [
         description: '(ModbusMaster Request) Read soil moisture, temperature, EC, PH, and NPK from RS485 soil sensor',
         version: '1.0.0',
         depends: [],
+        requires: [ 'ModbusMaster' ],
         src: soilRS485Extension,
     },
     {
@@ -263,6 +268,7 @@ const extensionIndex: ExtensionProps[] = [
         description: '(ModbusMaster Request) Read distance (mm) from A01NYUB waterproof ultrasonic sensor',
         version: '1.0.0',
         depends: [],
+        requires: [ 'ModbusMaster' ],
         src: a01nyubExtension,
     },
     {
@@ -272,6 +278,7 @@ const extensionIndex: ExtensionProps[] = [
         description: '(ModbusMaster Request) Read distance (mm) from DJLK-003AB waterproof ultrasonic sensor',
         version: '1.0.0',
         depends: [],
+        requires: [ 'ModbusMaster' ],
         src: djlk003abExtension,
     },
     {
