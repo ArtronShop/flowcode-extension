@@ -41,6 +41,7 @@ import dcMotorExtension from "./DCMotor.flowext";
 import keypadExtension from "./Keypad.flowext";
 import waterFlowExtension from "./WaterFlow.flowext";
 import stepMotorExtension from "./StepMotor.flowext";
+import sdCardExtension from "./SDCard.flowext";
 
 const extensionIndex: ExtensionProps[] = [
     {
@@ -388,6 +389,14 @@ const extensionIndex: ExtensionProps[] = [
         version: '1.0.0',
         depends: ['AccelStepper@1.64.0'],
         src: stepMotorExtension,
+    },
+    {
+        id: 'SDCard',
+        name: 'SD Card',
+        author: 'ArtronShop CO.,LTD.',
+        description: 'SD Card via SPI — Begin, Write (append/overwrite), Read, Exists, Remove, Mkdir',
+        version: '1.0.0',
+        src: sdCardExtension,
     },
     {
         id: '4-20mA',
