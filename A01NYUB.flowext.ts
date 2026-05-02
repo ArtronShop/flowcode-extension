@@ -36,6 +36,7 @@ const a01nyubExtension: BlockCategory = {
                         '  if ((last_measure == 0) || ((millis() - last_measure) >= 100) || (millis() < last_measure)) {',
                         '    last_measure = millis();',
                         `    modbus.begin(${device_id}, *modbus_serial);`,
+                        `    modbus.setResponseTimeout(500);`,
                         '    result = modbus.readHoldingRegisters(0x0100, 1);',
                         '    if (result == modbus.ku8MBSuccess) {',
                         '      _dist = (int)modbus.getResponseBuffer(0);',

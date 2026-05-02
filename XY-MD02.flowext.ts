@@ -44,6 +44,7 @@ const xymd02Extension: BlockCategory = {
                         '  if ((last_measure == 0) || ((millis() - last_measure) >= (100)) || (millis() < last_measure)) {',
                         '    last_measure = millis();',
                         `    modbus.begin(${device_id}, *modbus_serial);`,
+                        `    modbus.setResponseTimeout(500);`,
                         '    result = modbus.readInputRegisters(1, 2);',
                         '    if (result == modbus.ku8MBSuccess) {',
                         '      temp = modbus.getResponseBuffer(0) / 10.0f;',

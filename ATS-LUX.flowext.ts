@@ -36,6 +36,7 @@ const atsluxExtension: BlockCategory = {
                         '  if ((last_measure == 0) || ((millis() - last_measure) >= (100)) || (millis() < last_measure)) {',
                         '    last_measure = millis();',
                         `    modbus.begin(${device_id}, *modbus_serial);`,
+                        `    modbus.setResponseTimeout(500);`,
                         '    result = modbus.readInputRegisters(1, 2);',
                         '    if (result == modbus.ku8MBSuccess) {',
                         '      lightLUX = (uint32_t)((modbus.getResponseBuffer(1) << 16) | modbus.getResponseBuffer(0));',
