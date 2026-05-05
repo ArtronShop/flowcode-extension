@@ -411,7 +411,7 @@ const extensionIndex: ExtensionProps[] = [
         author: 'ArtronShop CO.,LTD.',
         description: 'Read 4-20mA current loop via AS-4-20mA / IOXESP32 4-20mA shield',
         version: '1.0.0',
-        depends: ['IOXESP32_4-20mA_Receiver@1.1.1'],
+        depends: ['IOXESP32_4-20mA_Receiver@1.2.0'],
         src: r420Extension,
     },
 ];
