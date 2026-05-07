@@ -42,6 +42,7 @@ import keypadExtension from "./Keypad.flowext";
 import waterFlowExtension from "./WaterFlow.flowext";
 import stepMotorExtension from "./StepMotor.flowext";
 import sdCardExtension from "./SDCard.flowext";
+import stateMachineExtension from "./StateMachine.flowext";
 
 const extensionIndex: ExtensionProps[] = [
     {
@@ -404,6 +405,14 @@ const extensionIndex: ExtensionProps[] = [
         description: 'SD Card via SPI — Begin, Write (append/overwrite), Read, Exists, Remove, Mkdir',
         version: '1.0.0',
         src: sdCardExtension,
+    },
+    {
+        id: 'StateMachine',
+        name: 'State Machine',
+        author: 'ArtronShop CO.,LTD.',
+        description: 'Finite State Machine — State (branch by current state), State Change, Current State expression',
+        version: '1.0.0',
+        src: stateMachineExtension,
     },
     {
         id: '4-20mA',
