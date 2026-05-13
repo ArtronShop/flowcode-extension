@@ -43,6 +43,7 @@ import waterFlowExtension from "./WaterFlow.flowext";
 import stepMotorExtension from "./StepMotor.flowext";
 import sdCardExtension from "./SDCard.flowext";
 import stateMachineExtension from "./StateMachine.flowext";
+import duinoClawExtension from "./DuinoClaw.flowext";
 
 const extensionIndex: ExtensionProps[] = [
     {
@@ -413,6 +414,15 @@ const extensionIndex: ExtensionProps[] = [
         description: 'Finite State Machine — State (branch by current state), State Change, Current State expression',
         version: '1.0.0',
         src: stateMachineExtension,
+    },
+    {
+        id: 'DuinoClaw',
+        name: 'DuinoClaw (AI)',
+        author: 'ArtronShop CO.,LTD.',
+        description: 'AI assistant on ESP32 via OpenAI GPT — Begin, Prompt, On Response, Tools (GPIO/WiFi/Time)',
+        version: '1.0.0',
+        depends: ['DuinoClaw@1.0.0', 'ArduinoJson@7.4.1'],
+        src: duinoClawExtension,
     },
     {
         id: '4-20mA',

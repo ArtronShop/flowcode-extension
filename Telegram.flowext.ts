@@ -43,7 +43,7 @@ const telegramExtension: BlockCategory = {
 				registerGlobal('String _tg_text = "";');
 
 				registerPollingCode([
-					`if (WiFi.connected()) { // Telegram Bot Polling`,
+					`if (WiFi.isConnected()) { // Telegram Bot Polling`,
 					`  static unsigned long _tg_last_time = 0;`,
 					`  if (millis() - _tg_last_time > ${interval}) {`,
 					`    int _tg_n = ${TG_BOT}.getUpdates(${TG_BOT}.last_message_received + 1);`,
@@ -154,10 +154,6 @@ const telegramExtension: BlockCategory = {
 				{ id: 'message', type: 'text', label: 'Message',  default: 'Hello', description: 'ข้อความ fallback' },
 			],
 			toCode({ block, pad, safeId, params, resolveInput, registerPreprocessor, registerGlobal }) {
-				registerPreprocessor('#include <UniversalTelegramBot.h>');
-				registerGlobal(`WiFiClientSecure ${TG_SEC};`);
-				registerGlobal(`UniversalTelegramBot ${TG_BOT}("", ${TG_SEC});`);
-				const id      = safeId(block.id);
 				const chatId  = resolveInput('chat_id') ?? `"${(params.chat_id ?? '').replaceAll('"', '\\"')}"`;
 				const message = resolveInput('message') ?? `"${(params.message ?? 'Hello').replaceAll('"', '\\"')}"`;
 				return {
