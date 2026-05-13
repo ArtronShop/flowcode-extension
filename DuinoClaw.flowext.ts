@@ -389,19 +389,20 @@ const duinoClawExtension: BlockCategory = {
             category: 'DuinoClaw',
             description: 'ส่งผลลัพธ์กลับให้ AI จาก Custom Tool\nใช้ภายใน Custom Tool On Call',
             inputs: [
-                { id: 'in', type: 'input', label: '➜', dataType: 'any' },
-                { id: 'msg', type: 'input', label: 'Message', dataType: 'String', description: 'ข้อความตอบกลับ (ถ้าไม่ต่อสาย ใช้จาก param)' },
+                { id: 'msg', type: 'input', label: 'Message', dataType: 'any', description: 'ข้อความตอบกลับ (ถ้าไม่ต่อสาย ใช้จาก param)' },
             ],
             outputs: [{ id: 'out', type: 'output', label: '➜', dataType: 'void' }],
             params: [
-                TOOL_NAME_PARAM,
                 { id: 'message', type: 'text', label: 'Message', default: 'OK', description: 'ใช้เมื่อไม่มีบล็อกต่อเข้า Message' },
             ],
             toCode({ pad, params, resolveInput, registerPreprocessor, registerGlobal, registerPollingCode }) {
                 registerDCBase(registerPreprocessor, registerGlobal, registerPollingCode);
-                const expr = resolveInput('msg') ?? `"${(params.message ?? 'OK').replaceAll('"', '\\"')}"`;
+                const expr = resolveInput('msg') ?? `F("${(params.message ?? 'OK').replaceAll('"', '\\"')}")`;
                 return {
-                    parts: [[`${pad}_result = ${expr};`], { portId: 'out', depthDelta: 0 }]
+                    parts: [
+                        [`${pad}_result = ${expr};`], 
+                        { portId: 'out', depthDelta: 0 }
+                    ]
                 };
             }
         },
