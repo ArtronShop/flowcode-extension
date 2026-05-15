@@ -421,7 +421,7 @@ const extensionIndex: ExtensionProps[] = [
         author: 'ArtronShop CO.,LTD.',
         description: 'AI assistant on ESP32 via OpenAI GPT — Begin, Prompt, On Response, Tools (GPIO/WiFi/Time)',
         version: '1.0.0',
-        depends: ['DuinoClaw@1.0.0', 'ArduinoJson@7.4.1'],
+        depends: ['DuinoClaw@1.0.1', 'ArduinoJson@7.4.1'],
         src: duinoClawExtension,
     },
     {
