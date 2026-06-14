@@ -18,6 +18,7 @@ function bh1750Register(
 		[
 			'  static bool init = false;',
 			'  if (!init) {',
+			'    Wire.begin();',
 			'    if (!_bh1750.begin()) return false;',
 			'    init = true;',
 			'  }',
