@@ -44,6 +44,7 @@ import stepMotorExtension from "./StepMotor.flowext";
 import sdCardExtension from "./SDCard.flowext";
 import stateMachineExtension from "./StateMachine.flowext";
 import duinoClawExtension from "./DuinoClaw.flowext";
+import scd4xExtension from "./SCD4x.flowext";
 
 const extensionIndex: ExtensionProps[] = [
     {
@@ -432,6 +433,15 @@ const extensionIndex: ExtensionProps[] = [
         version: '1.0.0',
         depends: ['IOXESP32_4-20mA_Receiver@1.2.0'],
         src: r420Extension,
+    },
+    {
+        id: 'SCD4x',
+        name: 'SCD4x CO2 & Temp & Humid Sensor',
+        author: 'ArtronShop CO.,LTD.',
+        description: 'Read CO2 (ppm), temperature and humidity from SCD40 / SCD41 sensor via I2C',
+        version: '1.0.0',
+        depends: ['SparkFun SCD4x Arduino Library@1.1.2'],
+        src: scd4xExtension,
     },
 ];
 
